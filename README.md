@@ -5,10 +5,15 @@ Data Exfiltration is a **Python and PowerShell** tool that allows you to **conve
 
 ## Features
 ✅ Splits files into multiple parts (`file_part1.txt`, `file_part2.txt`, etc.)
+
 ✅ Uses **XOR encryption** with a random key for stealth encoding
+
 ✅ **No Base64** (avoiding security tool detection)
+
 ✅ Restores files exactly as they were (including executables)
+
 ✅ **No file deletion** (Original files remain intact)
+
 ✅ Works on **Windows/Linux/macOS**
 
 ---
