@@ -3,6 +3,13 @@
 ## Overview
 Data Exfiltration is a **Python and PowerShell** tool that allows you to **convert any file** (e.g., `.exe`, `.pdf`, `.jpg`, `.xlsx`) into disguised `.txt` files. The encoded files can be safely stored and later restored to their original format. This helps in **evading detection** from EDR, DLP, and SOC teams.
 
+## Purpose
+Many organizations use **Data Loss Prevention (DLP) solutions** to block direct file uploads. However, **copy-pasting text is often allowed**. This tool enables an **insider threat** to covertly exfiltrate data by:
+1. **Converting files to text-based `.txt` parts**.
+2. **Copy-pasting the disguised text** to another system (e.g., email, chat, cloud storage).
+3. **Downloading the parts and restoring the original file** without detection.
+
+
 ## Features
 ✅ Splits files into multiple parts (`file_part1.txt`, `file_part2.txt`, etc.)
 
