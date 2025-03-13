@@ -56,12 +56,12 @@ python Data-Exfiltration.py /path/to/folder --decode
 
 ### **1️⃣ Convert Files to `.txt`**
 ```powershell
-powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Data\Data_imp"
+powershell -ExecutionPolicy Bypass -File Data-Exfiltration.ps1 -folder "C:\Users\Data\Data_imp"
 ```
 
 ### **2️⃣ Restore Files from `.txt` Parts**
 ```powershell
-powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Data\Data_imp" -decode
+powershell -ExecutionPolicy Bypass -File Data-Exfiltration.ps1 -folder "C:\Users\Data\Data_imp" -decode
 ```
 
 ### **Alternative (Without Saving Script Locally)**
