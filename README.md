@@ -25,21 +25,21 @@ Python 3 is required, but no external dependencies.
 
 ### **2️⃣ Convert Files to `.txt`**
 ```sh
-python file_converter.py /path/to/folder
+python Data-Exfiltration.py /path/to/folder
 ```
 - Example: 
   ```sh
-  python file_converter.py harsh_imp
+  python Data-Exfiltration.py Data_imp
   ```
-- This will convert all files in `harsh_imp/` into `.txt` parts.
+- This will convert all files in `Data_imp/` into `.txt` parts.
 
 ### **3️⃣ Restore Original Files**
 ```sh
-python file_converter.py /path/to/folder --decode
+python Data-Exfiltration.py /path/to/folder --decode
 ```
 - Example:
   ```sh
-  python file_converter.py harsh_imp --decode
+  python Data-Exfiltration.py Data_imp --decode
   ```
 - This will merge `.txt` parts and restore the original files.
 
@@ -49,18 +49,18 @@ python file_converter.py /path/to/folder --decode
 
 ### **1️⃣ Convert Files to `.txt`**
 ```powershell
-powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Harsh\harsh_imp"
+powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Data\Data_imp"
 ```
 
 ### **2️⃣ Restore Files from `.txt` Parts**
 ```powershell
-powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Harsh\harsh_imp" -decode
+powershell -ExecutionPolicy Bypass -File FileConverter.ps1 -folder "C:\Users\Data\Data_imp" -decode
 ```
 
 ### **Alternative (Without Saving Script Locally)**
 ```powershell
 IEX (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/user/FileConverter.ps1" -UseBasicParsing).Content
-Encode-Files -folder "C:\Users\Harsh\harsh_imp"
+Encode-Files -folder "C:\Users\Data\Data_imp"
 ```
 
 ---
