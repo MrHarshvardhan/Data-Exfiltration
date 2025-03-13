@@ -2,17 +2,23 @@ import os
 import argparse
 import random
 import string
+import base64
 
 def generate_key(length=10):
+    """Generate a random encryption key."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
-def xor_encrypt_decrypt(content, key):
-    return ''.join(chr(ord(c) ^ ord(key[i % len(key)])) for i, c in enumerate(content))
+def xor_encrypt_decrypt(content_bytes, key):
+    """Perform XOR encryption/decryption on binary data."""
+    key_bytes = key.encode()  # Convert key to bytes
+    return bytes([content_bytes[i] ^ key_bytes[i % len(key_bytes)] for i in range(len(content_bytes))])
 
 def split_file(content, part_size):
+    """Split content into parts of specified size."""
     return [content[i:i+part_size] for i in range(0, len(content), part_size)]
 
 def merge_parts(folder, filename, total_parts):
+    """Merge file parts into a single content string."""
     full_content = ""
     for idx in range(1, total_parts + 1):
         part_filename = f"{filename}_part{idx}.txt"
@@ -25,16 +31,20 @@ def merge_parts(folder, filename, total_parts):
     return full_content
 
 def encode_files(folder, part_size=500000):  # Default part size ~500KB
+    """Encode files into encrypted Base64 split text parts."""
     for file in os.listdir(folder):
         file_path = os.path.join(folder, file)
         if os.path.isfile(file_path):
             with open(file_path, 'rb') as f:
-                binary_content = f.read()
+                binary_content = f.read()  # Read file as binary
             
             key = generate_key()
-            encrypted_content = xor_encrypt_decrypt(binary_content.decode(errors='ignore'), key)
+            encrypted_content = xor_encrypt_decrypt(binary_content, key)  # Encrypt
             
-            parts = split_file(encrypted_content, part_size)
+            # Convert encrypted binary to Base64 string
+            encoded_base64 = base64.b64encode(encrypted_content).decode()
+
+            parts = split_file(encoded_base64, part_size)
             base_name = os.path.splitext(file)[0]
             
             for idx, part in enumerate(parts):
@@ -42,11 +52,12 @@ def encode_files(folder, part_size=500000):  # Default part size ~500KB
                 with open(part_filename, 'w', encoding='utf-8') as f:
                     if idx == 0:
                         f.write(f"{os.path.splitext(file)[1]}\n{key}\n")  # Store extension and key in the first part
-                    f.write(part)
+                    f.write(part)  # Write Base64-encoded encrypted content
             
-            print(f"Converted: {file} -> {len(parts)} parts")
+            print(f"Encoded: {file} -> {len(parts)} parts")
 
 def decode_files(folder):
+    """Decode encrypted text parts back into original files."""
     decoded_files = {}
     for file in os.listdir(folder):
         if file.endswith('.txt') and os.path.isfile(os.path.join(folder, file)):
@@ -67,13 +78,21 @@ def decode_files(folder):
         lines = full_content.split('\n', 2)
         original_extension = lines[0].strip()  # Read stored extension
         key = lines[1].strip()  # Read stored key
-        encrypted_content = lines[2] if len(lines) > 2 else ""
+
+        # Extract Base64 Encrypted Data
+        encrypted_base64 = lines[2] if len(lines) > 2 else ""
         
-        decrypted_content = xor_encrypt_decrypt(encrypted_content, key)
+        # Convert Base64 back to encrypted bytes
+        encrypted_bytes = base64.b64decode(encrypted_base64)
+
+        # XOR Decrypt
+        decrypted_content = xor_encrypt_decrypt(encrypted_bytes, key)
+
+        # Restore the original file
         original_filename = os.path.join(folder, base_file + original_extension)
         with open(original_filename, 'wb') as f:
-            f.write(decrypted_content.encode(errors='ignore'))
-        
+            f.write(decrypted_content)
+
         print(f"Restored: {base_file} -> {original_filename}")
 
 if __name__ == "__main__":
