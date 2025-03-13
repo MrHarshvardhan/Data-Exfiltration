@@ -10,10 +10,11 @@ function Generate-Key {
 }
 
 function XOR-Encrypt-Decrypt {
-    param([string]$content, [string]$key)
-    $output = ""
+    param([byte[]]$content, [byte[]]$key)
+    
+    $output = New-Object byte[] $content.Length
     for ($i = 0; $i -lt $content.Length; $i++) {
-        $output += [char]([byte][char]$content[$i] -bxor [byte][char]$key[$i % $key.Length])
+        $output[$i] = $content[$i] -bxor $key[$i % $key.Length]
     }
     return $output
 }
@@ -49,12 +50,19 @@ function Encode-Files {
         $fileName = $_.BaseName
         $extension = $_.Extension
 
+        # Read file as binary
         $binaryContent = [System.IO.File]::ReadAllBytes($filePath)
-        $stringContent = [System.Text.Encoding]::UTF8.GetString($binaryContent)
-
         $key = Generate-Key
-        $encryptedContent = XOR-Encrypt-Decrypt -content $stringContent -key $key
-        $parts = Split-File -content $encryptedContent -partSize $partSize
+        $keyBytes = [System.Text.Encoding]::UTF8.GetBytes($key)
+
+        # XOR Encrypt
+        $encryptedContent = XOR-Encrypt-Decrypt -content $binaryContent -key $keyBytes
+
+        # Convert to Base64 for text-safe storage
+        $encodedBase64 = [Convert]::ToBase64String($encryptedContent)
+
+        # Split file into parts
+        $parts = Split-File -content $encodedBase64 -partSize $partSize
 
         for ($i = 0; $i -lt $parts.Count; $i++) {
             $partFile = "$folder\$fileName`_part$($i+1).txt"
@@ -63,8 +71,8 @@ function Encode-Files {
             }
             $parts[$i] | Out-File -FilePath $partFile -Append -Encoding utf8
         }
-        
-        Write-Host "Converted: $($_.Name) -> $($parts.Count) parts"
+
+        Write-Host "Encoded: $($_.Name) -> $($parts.Count) text parts"
     }
 }
 
@@ -92,12 +100,21 @@ function Decode-Files {
         $lines = $fullContent -split "`n", 3
         $originalExtension = $lines[0].Trim()
         $key = $lines[1].Trim()
-        $encryptedContent = if ($lines.Count -gt 2) { $lines[2] } else { "" }
+        $keyBytes = [System.Text.Encoding]::UTF8.GetBytes($key)
 
-        $decryptedContent = XOR-Encrypt-Decrypt -content $encryptedContent -key $key
+        # Extract Base64 Encrypted Data
+        $encryptedBase64 = if ($lines.Count -gt 2) { $lines[2] } else { "" }
+
+        # Convert Base64 to Binary
+        $encryptedBytes = [Convert]::FromBase64String($encryptedBase64)
+
+        # XOR Decrypt
+        $decryptedContent = XOR-Encrypt-Decrypt -content $encryptedBytes -key $keyBytes
+
+        # Restore file
         $originalFilename = "$folder\$baseFile$originalExtension"
+        [System.IO.File]::WriteAllBytes($originalFilename, $decryptedContent)
 
-        [System.IO.File]::WriteAllBytes($originalFilename, [System.Text.Encoding]::UTF8.GetBytes($decryptedContent))
         Write-Host "Restored: $baseFile -> $originalFilename"
     }
 }
